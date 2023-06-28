@@ -18,24 +18,23 @@ public class MessageService {
         this.calendarEventService = calendarEventService;
     }
 
-    public ChatMessage receive(ChatMessage chatMessage) {
-        if (!checkIfContainDate(chatMessage.getContent()).isEmpty()) {
-            return chatMessage;
-        }
-
-        return new ChatMessage();
-    }
-
     @SneakyThrows
-    private String checkIfContainDate(final String content) {
+    public ChatMessage receive(ChatMessage chatMessage) {
 
         Pattern pattern = Pattern.compile("^([1-9]|[012][0-9]|3[01])\\.([0]{0,1}[1-9]|1[012])\\.(\\d\\d) ([012]{0,1}[0-9]:[0-6][0-9]) ([aA-zZ]*)");
-        Matcher matcher = pattern.matcher(content);
+        Matcher matcher = pattern.matcher(chatMessage.getContent());
         if (matcher.find()) {
-            return calendarEventService.addEvent(populateEvent(matcher));
+            String event = calendarEventService.addEvent(populateEvent(matcher));
+            return buildResponseMessage(chatMessage, event);
         }
 
-        return content;
+        return chatMessage;
+    }
+
+    private ChatMessage buildResponseMessage(ChatMessage chatMessage, String s) {
+        chatMessage.setContent("Created new event for: ".concat(chatMessage.getContent()));
+        chatMessage.setLink(s);
+        return chatMessage;
     }
 
     private Map<String, String> populateEvent(Matcher matcher) {

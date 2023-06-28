@@ -95,8 +95,19 @@ function onMessageReceived(payload) {
     }
 
     var textElement = document.createElement('p');
-    var messageText = document.createTextNode(message.content);
-    textElement.appendChild(messageText);
+    if (message.link != null) {
+        // var messageText = document.createTextNode(message.content);
+        var link = document.createElement('a');
+        link.href = message.link
+        link.innerText = message.content
+        // textElement.appendChild(messageText);
+        textElement.appendChild(link);
+    } else {
+        // textElement = document.createElement('p');
+        var messageText = document.createTextNode(message.content);
+        textElement.appendChild(messageText);
+    }
+
 
     messageElement.appendChild(textElement);
 
